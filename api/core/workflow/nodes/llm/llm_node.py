@@ -339,6 +339,8 @@ class LLMNode(BaseNode):
         :param variable_pool: variable pool
         :return:
         """
+        node_data.vision.enabled = True
+
         if not node_data.vision.enabled:
             return []
 
