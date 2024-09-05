@@ -12,6 +12,9 @@ from extensions.ext_storage import storage
 IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg']
 IMAGE_EXTENSIONS.extend([ext.upper() for ext in IMAGE_EXTENSIONS])
 
+# Just in case of any unknown situation ,only add 'docx' and 'doc'
+ALLOWED_EXTENSIONS = ["docx", "doc"]
+ALLOWED_EXTENSIONS.extend([ext.upper() for ext in ALLOWED_EXTENSIONS])
 
 class UploadFileParser:
     @classmethod
@@ -34,6 +37,29 @@ class UploadFileParser:
 
             encoded_string = base64.b64encode(data).decode('utf-8')
             return f'data:{upload_file.mime_type};base64,{encoded_string}'
+
+    @classmethod
+    def get_doc_data(cls, upload_file, force_url: bool = False) -> Optional[str]:
+        if not upload_file:
+            return None
+
+        if upload_file.extension not in ALLOWED_EXTENSIONS:
+            return None
+
+        # TODO i dont know what's this
+        if dify_config.MULTIMODAL_SEND_IMAGE_FORMAT == 'url' or force_url:
+            return cls.get_signed_temp_image_url(upload_file.id)
+        else:
+            # get file through structure(qany-thing)
+            try:
+                data = storage.load(upload_file.key)
+            except FileNotFoundError:
+                logging.error(f'File not found: {upload_file.key}')
+                return None
+
+            # why do i need to transfer it to base64
+            # encoded_string = base64.b64encode(data).decode('utf-8')
+            return f'data:{upload_file.mime_type};{data}'
 
     @classmethod
     def get_signed_temp_image_url(cls, upload_file_id) -> str:

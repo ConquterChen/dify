@@ -51,6 +51,7 @@ class PromptMessageContentType(Enum):
     """
     TEXT = 'text'
     IMAGE = 'image'
+    DOCUMENT = 'doc'
 
 
 class PromptMessageContent(BaseModel):
@@ -78,6 +79,10 @@ class ImagePromptMessageContent(PromptMessageContent):
 
     type: PromptMessageContentType = PromptMessageContentType.IMAGE
     detail: DETAIL = DETAIL.LOW
+
+
+class DocPromptMessageContent(PromptMessageContent):
+    type: PromptMessageContentType = PromptMessageContentType.DOCUMENT
 
 
 class PromptMessage(ABC, BaseModel):
@@ -108,10 +113,12 @@ class AssistantPromptMessage(PromptMessage):
     """
     Model class for assistant prompt message.
     """
+
     class ToolCall(BaseModel):
         """
         Model class for assistant prompt message tool call.
         """
+
         class ToolCallFunction(BaseModel):
             """
             Model class for assistant prompt message tool call function.
@@ -144,6 +151,7 @@ class AssistantPromptMessage(PromptMessage):
             return False
 
         return True
+
 
 class SystemPromptMessage(PromptMessage):
     """

@@ -169,15 +169,10 @@ class AdvancedChatDraftWorkflowRunApi(Resource):
         args = parser.parse_args()
 
         # change file
-        # filelist = list()
-        # filedict = dict()
-        # filedict['type'] = 'document'
-        # filedict['transfer_method'] = 'local_file'
-        #
-        # filedict['url'] = 'document'
-        # filedict['upload_file_id'] = '81465a50-b06d-449e-ba1a-423d8c6f6878'
-        # filelist.append(filedict)
-        # args["files"] = filelist
+        filedict = {'type': 'document', 'transfer_method': 'local_file', 'url': 'document',
+                    'upload_file_id': '906d0214-467a-4ccb-89da-1ad7c66991f6'}
+        filelist = [filedict]
+        args["files"] = filelist
 
         try:
             response = AppGenerateService.generate(

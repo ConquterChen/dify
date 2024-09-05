@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from core.file.tool_file_parser import ToolFileParser
 from core.file.upload_file_parser import UploadFileParser
-from core.model_runtime.entities.message_entities import ImagePromptMessageContent
+from core.model_runtime.entities.message_entities import DocPromptMessageContent, ImagePromptMessageContent
 from extensions.ext_database import db
 
 
@@ -109,7 +109,7 @@ class FileVar(BaseModel):
         return self._get_data(force_url=True)
 
     @property
-    def prompt_message_content(self) -> ImagePromptMessageContent:
+    def prompt_message_content(self):
         if self.type == FileType.IMAGE:
             image_config = self.extra_config.image_config
 
@@ -118,9 +118,29 @@ class FileVar(BaseModel):
                 detail=ImagePromptMessageContent.DETAIL.HIGH
                 if image_config.get("detail") == "high" else ImagePromptMessageContent.DETAIL.LOW
             )
+        if self.type == FileType.DOCUMENT:
+            return DocPromptMessageContent(
+                data=self.data,
+            )
 
     def _get_data(self, force_url: bool = False) -> Optional[str]:
         from models.model import UploadFile
+
+        # why do i must distinguish the FileType //danika ask!
+        if self.type == FileType.DOCUMENT:
+            if self.transfer_method == FileTransferMethod.REMOTE_URL:
+                return self.url
+            elif self.transfer_method == FileTransferMethod.LOCAL_FILE:
+                upload_file = (db.session.query(UploadFile)
+                               .filter(
+                    UploadFile.id == self.related_id,
+                    UploadFile.tenant_id == self.tenant_id
+                ).first())
+
+                return UploadFileParser.get_doc_data(
+                    upload_file=upload_file,
+                    force_url=force_url
+                )
         if self.type == FileType.IMAGE:
             if self.transfer_method == FileTransferMethod.REMOTE_URL:
                 return self.url
