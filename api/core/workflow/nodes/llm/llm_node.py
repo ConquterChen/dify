@@ -91,8 +91,7 @@ class LLMNode(BaseNode):
             # fetch memory
             memory = self._fetch_memory(node_data.memory, variable_pool, model_instance)
 
-            # fetch prompt messages
-            prompt_messages, stop = self._fetch_prompt_messages(
+            result = self._fetch_prompt_messages(
                 node_data=node_data,
                 query=variable_pool.get_any(['sys', SystemVariableKey.QUERY.value])
                 if node_data.memory else None,
@@ -103,6 +102,20 @@ class LLMNode(BaseNode):
                 memory=memory,
                 model_config=model_config
             )
+
+            prompt_messages, stop = result
+            # fetch prompt messages
+            # prompt_messages, stop = self._fetch_prompt_messages(
+            #     node_data=node_data,
+            #     query=variable_pool.get_any(['sys', SystemVariableKey.QUERY.value])
+            #     if node_data.memory else None,
+            #     query_prompt_template=node_data.memory.query_prompt_template if node_data.memory else None,
+            #     inputs=inputs,
+            #     files=files,
+            #     context=context,
+            #     memory=memory,
+            #     model_config=model_config
+            # )
 
             process_data = {
                 'model_mode': model_config.mode,
@@ -580,6 +593,8 @@ class LLMNode(BaseNode):
                             content_item.detail = ImagePromptMessageContent.DETAIL(vision_detail)
                         prompt_message_content.append(content_item)
                     elif content_item.type == PromptMessageContentType.TEXT:
+                        prompt_message_content.append(content_item)
+                    elif content_item.type == PromptMessageContentType.DOCUMENT:
                         prompt_message_content.append(content_item)
 
                 if len(prompt_message_content) > 1:

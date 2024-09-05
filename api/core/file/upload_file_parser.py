@@ -8,6 +8,7 @@ from typing import Optional
 
 from configs import dify_config
 from extensions.ext_storage import storage
+from extract_file_Danika.extract_file import extract_file
 
 IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg']
 IMAGE_EXTENSIONS.extend([ext.upper() for ext in IMAGE_EXTENSIONS])
@@ -52,7 +53,12 @@ class UploadFileParser:
         else:
             # get file through structure(qany-thing)
             try:
-                data = storage.load(upload_file.key)
+                # data = storage.load(upload_file.key)
+                # maybe need to load as other format?
+                docs = extract_file(upload_file.key)
+                for i in docs:
+                    data = i.page_content
+
             except FileNotFoundError:
                 logging.error(f'File not found: {upload_file.key}')
                 return None

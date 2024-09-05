@@ -6,7 +6,7 @@ from core.model_runtime.entities.message_entities import (
     PromptMessage,
     PromptMessageContentType,
     PromptMessageRole,
-    TextPromptMessageContent,
+    TextPromptMessageContent, PromptMessageContent, DocPromptMessageContent,
 )
 from core.prompt.simple_prompt_transform import ModelMode
 
@@ -51,6 +51,14 @@ class PromptMessageUtil:
                         if content.type == PromptMessageContentType.TEXT:
                             content = cast(TextPromptMessageContent, content)
                             text += content.data
+                        elif content.type == PromptMessageContentType.DOCUMENT:
+                            # why don I think there no need to force cast?
+                            content = cast(DocPromptMessageContent, content)
+                            files.append({
+                                "type": 'document',
+                                "data": content.data[:10] + '...[TRUNCATED]...' + content.data[-10:],
+                                "detail": content.data
+                            })
                         else:
                             content = cast(ImagePromptMessageContent, content)
                             files.append({
@@ -79,6 +87,10 @@ class PromptMessageUtil:
                 for content in prompt_message.content:
                     if content.type == PromptMessageContentType.TEXT:
                         content = cast(TextPromptMessageContent, content)
+                        text += content.data
+                    elif content.type == PromptMessageContentType.DOCUMENT:
+                        # why don I think there no need to force cast?
+                        content = cast(DocPromptMessageContent, content)
                         text += content.data
                     else:
                         content = cast(ImagePromptMessageContent, content)
