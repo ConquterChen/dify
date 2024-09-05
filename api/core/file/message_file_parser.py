@@ -53,7 +53,34 @@ class MessageFileParser:
         # validate files
         new_files = []
         for file_type, file_objs in type_file_objs.items():
-            if file_type == FileType.IMAGE:
+            if file_type == FileType.DOCUMENT:
+                for file_obj in file_objs:
+                    # Validate transfer method
+                    if file_obj.transfer_method.value not in image_config['transfer_methods']:
+                        raise ValueError(f'Invalid transfer method: {file_obj.transfer_method.value}')
+
+                    if file_obj.transfer_method == FileTransferMethod.REMOTE_URL:
+                        # check remote url valid and is image
+                        result, error = self._check_image_remote_url(file_obj.url)
+                        if result is False:
+                            raise ValueError(error)
+                    elif file_obj.transfer_method == FileTransferMethod.LOCAL_FILE:
+                        # get upload file from upload_file_id
+                        upload_file = (db.session.query(UploadFile)
+                                       .filter(
+                            UploadFile.id == file_obj.related_id,
+                            UploadFile.tenant_id == self.tenant_id,
+                            UploadFile.created_by == user.id,
+                            UploadFile.created_by_role == ('account' if isinstance(user, Account) else 'end_user'),
+                            UploadFile.extension.in_(IMAGE_EXTENSIONS)
+                        ).first())
+
+                        # check upload file is belong to tenant and user
+                        if not upload_file:
+                            raise ValueError('Invalid upload file')
+                    new_files.append(file_obj)
+
+            elif file_type == FileType.IMAGE:
                 # parse and validate files
                 image_config = file_extra_config.image_config
 
@@ -124,7 +151,9 @@ class MessageFileParser:
         """
         type_file_objs: dict[FileType, list[FileVar]] = {
             # Currently only support image
-            FileType.IMAGE: []
+            FileType.IMAGE: [],
+            # danika add doc support
+            FileType.DOCUMENT: []
         }
 
         if not files:

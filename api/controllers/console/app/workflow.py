@@ -168,6 +168,17 @@ class AdvancedChatDraftWorkflowRunApi(Resource):
         parser.add_argument("conversation_id", type=uuid_value, location="json")
         args = parser.parse_args()
 
+        # change file
+        # filelist = list()
+        # filedict = dict()
+        # filedict['type'] = 'document'
+        # filedict['transfer_method'] = 'local_file'
+        #
+        # filedict['url'] = 'document'
+        # filedict['upload_file_id'] = '81465a50-b06d-449e-ba1a-423d8c6f6878'
+        # filelist.append(filedict)
+        # args["files"] = filelist
+
         try:
             response = AppGenerateService.generate(
                 app_model=app_model, user=current_user, args=args, invoke_from=InvokeFrom.DEBUGGER, streaming=True

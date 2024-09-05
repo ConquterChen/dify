@@ -18,6 +18,7 @@ class FileExtraConfig(BaseModel):
 
 class FileType(enum.Enum):
     IMAGE = 'image'
+    DOCUMENT = 'document'
 
     @staticmethod
     def value_of(value):
