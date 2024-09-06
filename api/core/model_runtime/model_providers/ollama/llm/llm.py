@@ -22,7 +22,7 @@ from core.model_runtime.entities.message_entities import (
     PromptMessageTool,
     SystemPromptMessage,
     TextPromptMessageContent,
-    UserPromptMessage,
+    UserPromptMessage, DocPromptMessageContent,
 )
 from core.model_runtime.entities.model_entities import (
     AIModelEntity,
@@ -214,6 +214,7 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                 else:
                     text = ""
                     images = []
+                    documents = ""
                     for message_content in first_prompt_message.content:
                         if message_content.type == PromptMessageContentType.TEXT:
                             message_content = cast(
@@ -230,8 +231,13 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                                 message_content.data,
                             )
                             images.append(image_data)
+                        elif message_content.type == PromptMessageContentType.DOCUMENT:
+                            message_content = cast(
+                                DocPromptMessageContent, message_content
+                            )
+                            documents = message_content.data
 
-                    data["prompt"] = text
+                    data["prompt"] = text + documents
                     data["images"] = images
 
         # send a post request to validate the credentials
@@ -437,6 +443,7 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
             else:
                 text = ""
                 images = []
+                documents = ""
                 for message_content in message.content:
                     if message_content.type == PromptMessageContentType.TEXT:
                         message_content = cast(
@@ -451,8 +458,12 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                             r"^data:image\/[a-zA-Z]+;base64,", "", message_content.data
                         )
                         images.append(image_data)
-
-                message_dict = {"role": "user", "content": text, "images": images}
+                    elif message_content.type == PromptMessageContentType.DOCUMENT:
+                        message_content = cast(
+                            DocPromptMessageContent, message_content
+                        )
+                        documents = message_content.data
+                message_dict = {"role": "user", "content": text + documents, "images": images}
         elif isinstance(message, AssistantPromptMessage):
             message = cast(AssistantPromptMessage, message)
             message_dict = {"role": "assistant", "content": message.content}

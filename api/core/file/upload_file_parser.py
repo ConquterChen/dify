@@ -48,6 +48,7 @@ class UploadFileParser:
             return None
 
         # TODO i dont know what's this
+        data = ''
         if dify_config.MULTIMODAL_SEND_IMAGE_FORMAT == 'url' or force_url:
             return cls.get_signed_temp_image_url(upload_file.id)
         else:
@@ -57,15 +58,14 @@ class UploadFileParser:
                 # maybe need to load as other format?
                 docs = extract_file(upload_file.key)
                 for i in docs:
-                    data = i.page_content
+                    data = i.page_content.replace(" ", '')
 
             except FileNotFoundError:
                 logging.error(f'File not found: {upload_file.key}')
                 return None
 
-            # why do i need to transfer it to base64
             # encoded_string = base64.b64encode(data).decode('utf-8')
-            return f'data:{upload_file.mime_type};{data}'
+            return data
 
     @classmethod
     def get_signed_temp_image_url(cls, upload_file_id) -> str:

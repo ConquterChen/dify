@@ -2,11 +2,12 @@ from typing import cast
 
 from core.model_runtime.entities.message_entities import (
     AssistantPromptMessage,
+    DocPromptMessageContent,
     ImagePromptMessageContent,
     PromptMessage,
     PromptMessageContentType,
     PromptMessageRole,
-    TextPromptMessageContent, PromptMessageContent, DocPromptMessageContent,
+    TextPromptMessageContent,
 )
 from core.prompt.simple_prompt_transform import ModelMode
 
