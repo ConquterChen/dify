@@ -11,3 +11,6 @@ class SystemVariableKey(str, Enum):
     CONVERSATION_ID = "conversation_id"
     USER_ID = "user_id"
     DIALOGUE_COUNT = "dialogue_count"
+
+    # danika add flag
+    Flag = "flag"

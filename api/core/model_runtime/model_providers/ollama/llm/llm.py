@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 
 import requests
 
+import contexts
 from core.model_runtime.entities.llm_entities import (
     LLMMode,
     LLMResult,
@@ -49,6 +50,7 @@ from core.model_runtime.errors.validate import CredentialsValidateFailedError
 from core.model_runtime.model_providers.__base.large_language_model import (
     LargeLanguageModel,
 )
+from core.workflow.enums import SystemVariableKey
 
 logger = logging.getLogger(__name__)
 
@@ -463,7 +465,13 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                         message_content = cast(
                             DocPromptMessageContent, message_content
                         )
-                        documents = message_content.data
+                        variable_pool = contexts.workflow_variable_pool.get()
+                        # if variable_pool.system_variables.get():
+                        if variable_pool.get(['sys', SystemVariableKey.Flag.value]):
+                            documents = message_content.data
+                            # TODO Need to alter flag
+                            variable_pool.set(['sys', SystemVariableKey.Flag.value], False)
+
                 message_dict = {"role": "user", "content": text + documents, "images": images}
         elif isinstance(message, AssistantPromptMessage):
             message = cast(AssistantPromptMessage, message)

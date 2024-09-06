@@ -295,6 +295,7 @@ class AdvancedChatAppGenerator(MessageBasedAppGenerator):
             SystemVariableKey.CONVERSATION_ID: conversation_id,
             SystemVariableKey.USER_ID: user_id,
             SystemVariableKey.DIALOGUE_COUNT: conversation_dialogue_count,
+            SystemVariableKey.Flag: True,
         }
         variable_pool = VariablePool(
             system_variables=system_inputs,

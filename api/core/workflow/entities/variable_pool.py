@@ -101,6 +101,24 @@ class VariablePool:
 
         return value
 
+    def set(self, selector: Sequence[str], value):
+        """
+        Retrieves the value from the variable pool based on the given selector.
+
+        Args:
+            selector (Sequence[str]): The selector used to identify the variable.
+            value (Any): The value to be set.
+        Returns:
+            Any: The value associated with the given selector.
+
+        Raises:
+            ValueError: If the selector is invalid.
+        """
+        if len(selector) < 2:
+            raise ValueError("Invalid selector")
+        hash_key = hash(tuple(selector[1:]))
+        self._variable_dictionary[selector[0]][hash_key] = value
+
     @deprecated("This method is deprecated, use `get` instead.")
     def get_any(self, selector: Sequence[str], /) -> Any | None:
         """
