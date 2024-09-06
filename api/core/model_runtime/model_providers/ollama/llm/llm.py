@@ -16,13 +16,14 @@ from core.model_runtime.entities.llm_entities import (
 )
 from core.model_runtime.entities.message_entities import (
     AssistantPromptMessage,
+    DocPromptMessageContent,
     ImagePromptMessageContent,
     PromptMessage,
     PromptMessageContentType,
     PromptMessageTool,
     SystemPromptMessage,
     TextPromptMessageContent,
-    UserPromptMessage, DocPromptMessageContent,
+    UserPromptMessage,
 )
 from core.model_runtime.entities.model_entities import (
     AIModelEntity,
