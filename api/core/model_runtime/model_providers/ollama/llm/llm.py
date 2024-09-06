@@ -469,7 +469,6 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                         # if variable_pool.system_variables.get():
                         if variable_pool.get(['sys', SystemVariableKey.Flag.value]):
                             documents = message_content.data
-                            # TODO Need to alter flag
                             variable_pool.set(['sys', SystemVariableKey.Flag.value], False)
 
                 message_dict = {"role": "user", "content": text + documents, "images": images}
